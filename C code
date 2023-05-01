@@ -1,0 +1,177 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define TAM 5
+
+typedef struct{
+    int codproduto;
+    char fornecedor[50];
+    char nomejogo[50];
+    float valor;
+    int quantidade;
+} Cadastrojogos;
+
+typedef struct{
+    int id;
+    Cadastrojogos elementos[TAM];
+} Lista;
+
+Lista* criarLista(){
+    Lista *nova = (Lista*)malloc(sizeof(Lista));
+    
+    if(nova == NULL){
+        printf("Não tem espaço\n");
+        return NULL;
+    }
+    
+    nova->id = 0;
+    
+    return nova;
+}
+
+Lista* excluirLista(Lista *lista){
+    free(lista);
+    return NULL;
+}
+
+void listar(Lista *lista){
+    int i;
+    
+    if(lista == NULL){
+        printf("A lista não foi criada\n");
+        return ;
+    }
+    
+    if(lista->id == 0){
+        printf("Lista vazia\n");
+        return ;
+    }
+    
+    for(i = 0; i < lista->id; ++i){
+        printf("Codproduto: %d \t", lista->elementos[i].codproduto);
+        printf("Fornecedor: %s \t", lista->elementos[i].fornecedor);
+        printf("Nomejogo: %s \t", lista->elementos[i].nomejogo);
+        printf("Valor: %.2f \t", lista->elementos[i].valor);
+        printf("Quantidade: %d \n\n", lista->elementos[i].quantidade);
+    }
+    printf("\n");
+}
+
+int inserirElemento(Lista *lista, int codproduto, char *fornecedor, char *nomejogo, float valor, int quantidade){
+    
+    if(lista == NULL){
+        printf("A lista não foi criada\n");
+        return 0;
+    }
+    
+    if(lista->id < TAM){
+        lista->elementos[lista->id].codproduto = codproduto;
+        strcpy(lista->elementos[lista->id].fornecedor, fornecedor);
+        strcpy(lista->elementos[lista->id].nomejogo, nomejogo);
+        lista->elementos[lista->id].valor = valor;
+        lista->elementos[lista->id].quantidade = quantidade;
+        
+        ++(lista->id);
+        return 1;
+    }else{
+        printf("Espaço esgotado\n");
+        return 0;
+    }
+}
+
+int atualizarElemento(Lista *lista, int busca, int codproduto, char *fornecedor, char *nomejogo, float valor, int quantidade){
+    int i;
+
+    if(lista == NULL){
+        printf("A lista nao foi criada\n");
+        return 0;
+    }
+
+    for(i = 0; i < lista->id; ++i){
+        if(lista->elementos[i].codproduto == busca){
+            lista->elementos[i].codproduto = codproduto;
+            strcpy(lista->elementos[i].fornecedor, fornecedor);
+            strcpy(lista->elementos[i].nomejogo, nomejogo);
+            lista->elementos[i].valor = valor;
+            lista->elementos[i].quantidade = quantidade;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int removerElemento(Lista *lista, int posicao){
+    int i, j;
+
+    if(lista == NULL){
+        printf("A lista nao foi criada\n");
+        return 0;
+    }
+
+    if (posicao < lista->id){
+       
+        for(j = posicao; j < lista->id-1; ++j){
+            lista->elementos[j].codproduto = lista->elementos[j+1].codproduto;
+            strcpy(lista->elementos[j].fornecedor, lista->elementos[j+1].fornecedor);
+            strcpy(lista->elementos[j].nomejogo, lista->elementos[j+1].nomejogo);
+            lista->elementos[j].valor = lista->elementos[j+1].valor;
+            lista->elementos[j].quantidade = lista->elementos[j+1].quantidade;
+        }
+        
+        --(lista->id);
+        return 1;
+    }else{
+        printf("Posicao invalida\n");
+        return 0;
+    }
+}
+
+int pesquisarElemento(Lista *lista, int codproduto){
+    int i;
+
+    if(lista == NULL){
+        printf("A lista nao foi criada\n");
+        return -1;
+    }
+
+    for(i = 0; i < lista->id; ++i){
+        if(lista->elementos[i].codproduto == codproduto){
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+
+int main(){
+    Lista *lista = criarLista();
+
+    inserirElemento(lista, 198, "Marcelo", "God of War", 120.0, 5);
+    inserirElemento(lista, 207, "Tiago", "Doom", 203.0, 10);
+    inserirElemento(lista, 303, "Joana", "Bayonneta", 308.0, 15);
+
+    printf("Lista inicial:\n");
+    listar(lista);
+
+    int posicao = pesquisarElemento(lista, 207);
+    if (posicao == -1) {
+        printf("Elemento nao encontrado\n");
+    } else {
+        atualizarElemento(lista, 207, 424, "Marcio", "Zelda", 405.0, 20);
+    }
+
+    printf("Lista apos atualizacao:\n");
+    listar(lista);
+
+    removerElemento(lista, 198);
+
+    printf("Lista apos remocao:\n");
+    listar(lista);
+
+    lista = excluirLista(lista);
+    
+    
+    return 0;
+}
